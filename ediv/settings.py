@@ -1,7 +1,9 @@
 from pathlib import Path
 import os
 import sys
-
+from datetime import timedelta 
+from dotenv import load_dotenv
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 PROJECT_ROOT = os.path.dirname(__file__)
@@ -26,9 +28,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
-    #MyApps
+    'rest_framework',                  # Django REST Framework
+    'rest_framework_simplejwt',        # Biblioteca Simple JWT
+    'djoser',                          # Biblioteca Djoser
     'authentication',
+    
 ]
 
 MIDDLEWARE = [
@@ -121,8 +125,47 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 AUTH_USER_MODEL = "authentication.Users"
+
 AUTHENTICATION_BACKENDS = (
     'authentication.backends.CustomBackend',
 )
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',  # Padrão: apenas usuários autenticados
+    ),
+}
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('Bearer',),  # Prefixo para o token
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),  # Tempo de vida do token de acesso
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=2),     # Tempo de vida do token de renovação
+}
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True, # Exige que os usuários forneçam a senha duas vezes ao criar uma conta
+    'SEND_CONFIRMATION_EMAIL': True, # Envio de um email de confirmação após o registro de uma nova conta.
+    'SEND_ACTIVATION_EMAIL': False,  # Desabilitar/Exige ativação de conta
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}/',  # Link enviado por email
+    'ACTIVATION_URL': 'activate/{uid}/{token}/',
+    'SERIALIZERS': {
+        'user_create': 'authentication.serializers.UserCreateSerializer',
+        'user': 'authentication.serializers.UserSerializer',
+        'user_delete': 'djoser.serializers.UserDeleteSerializer',
+    },
+}
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER')
