@@ -10,24 +10,23 @@ class UserAdmin(admin_auth_django.UserAdmin):
     model = Users
 
     # Campos exibidos na listagem de usuários no Django Admin
-    list_display = ("email", "username", "is_staff", "is_active")
-    list_filter = ("is_staff", "is_superuser", "is_active")
+    list_display = ('email', 'name', 'is_active', 'is_staff')
+    list_filter = ('is_staff', 'is_superuser', 'is_active')
 
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        ("Informações Pessoais", {"fields": ("username",)}),
-        ("Permissões", {"fields": ("is_staff", "is_superuser", "is_active", "groups", "user_permissions")}),
+        ("Informações Pessoais", {"fields": ("name",)}),
+        ("Permissões", {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         ("Datas Importantes", {"fields": ("last_login",)}),
     )
 
-    # Campos exibidos no formulário de criação do usuário
     add_fieldsets = (
         (None, {
             "classes": ("wide",),
-            "fields": ("email", "username", "password1", "password2", "is_staff", "is_superuser", "is_active"),
+            "fields": ("email", "name", "password1", "password2", "is_active", "is_staff"),
         }),
     )
 
-    search_fields = ("email", "username")
+    search_fields = ("email", "name")
     ordering = ("email",)

@@ -8,11 +8,12 @@ class CustomBackend(ModelBackend):
 
     def authenticate(self, request, username=None, password=None, **kwargs):
 
-        if username is None or password is None:
-            return None  # Retorna None caso username ou password não sejam fornecidos
+        email = username or kwargs.get('email')
+        if not email or not password:
+            return None
 
         try:
-            user = User.objects.get(email=username)  # Autentica pelo email
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
             return None
         
